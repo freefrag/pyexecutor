@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pyexecutor;
+
+service Executor {
+    rpc Execute (ExecuteRequest) returns (ExecuteResponse) {}
+}
+
+message ExecuteRequest {
+    string command = 1;
+    string expression = 2;
+}
+
+message ExecuteResponse {
+    string result = 1;
+}
