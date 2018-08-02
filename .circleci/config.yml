@@ -3,13 +3,8 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
-defaults: &defaults
-  working_directory: ~/repo
-  environment:
-    PROJECT_NAME: pyexecutor
 jobs:
   build:
-    <<: *defaults
     docker:
         - image: google/cloud-sdk
     working_directory: ~/repo
@@ -20,6 +15,7 @@ jobs:
       # GKE Options
       GCLOUD_COMPUTE_ZONE: europe-west1-b
       GCLOUD_PROJECT_ID: scenic-style-210822
+      PROJECT_NAME: pyexecutor
     steps:
       - checkout
       - setup_remote_docker
