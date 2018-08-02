@@ -1,0 +1,52 @@
+# Java Gradle CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+defaults: &defaults
+  working_directory: ~/repo
+  environment:
+    PROJECT_NAME: pyexecutor
+jobs:
+  deploy:
+    <<: *defaults
+    docker:
+        - image: google/cloud-sdk
+    working_directory: ~/repo
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+      # GKE Options
+      GCLOUD_COMPUTE_ZONE: europe-west1-b
+      GCLOUD_PROJECT_ID: scenic-style-210822
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Store Service Account Key
+          command: echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+      - run:
+          name: Set up gcloud
+          command: |
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GCLOUD_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GCLOUD_COMPUTE_ZONE}
+            gcloud --quiet auth configure-docker
+      - run:
+          name: build docker image
+          command: |
+            export GIT_VERSION=$(git describe --tags)
+            docker build -t "eu.gcr.io/${GCLOUD_PROJECT_ID}/${PROJECT_NAME}:${GIT_VERSION}" .
+            docker tag "eu.gcr.io/${GCLOUD_PROJECT_ID}/${PROJECT_NAME}:${GIT_VERSION}" "eu.gcr.io/${GCLOUD_PROJECT_ID}/${PROJECT_NAME}:latest"
+      - run:
+          name: Upload to registry
+          command: docker push "eu.gcr.io/${GCLOUD_PROJECT_ID}/${PROJECT_NAME}"
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
