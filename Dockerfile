@@ -17,7 +17,14 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.5.4-Linux-x86_
     echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
-RUN conda install -y grpcio ipykernel && \
-  python -m pip install grpcio-tools googleapis-common-protos
+RUN python -m pip install grpcio-tools grpcio-reflection googleapis-common-protos
 
-CMD [ "/bin/bash" ]
+RUN conda install -y grpcio ipykernel pandas
+
+ADD . ~/repo/
+
+WORKDIR ~/repo/
+
+RUN python run_codegen.py
+
+CMD python src/server.py

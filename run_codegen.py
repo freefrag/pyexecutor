@@ -2,8 +2,8 @@ from grpc_tools import protoc
 
 protoc.main((
     '',
-    '-I./protos',
-    '--python_out=./generated',
-    '--grpc_python_out=./generated',
-    './protos/pyexecutor.proto',
+    '-I./src/protos',
+    '--python_out=./src/',
+    '--grpc_python_out=./src/',
+    './src/protos/generated/pyexecutor.proto',
 ))

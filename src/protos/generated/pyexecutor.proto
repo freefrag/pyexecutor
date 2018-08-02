@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pyexecutor;
 
-service Executor {
+service PyExecutor {
     rpc Execute (ExecuteRequest) returns (ExecuteResponse) {}
 }
 
